@@ -1,0 +1,31 @@
+name: "Adobe Analytics and R - Examples"
+output_dir: "../dartistics.com/adobeanalytics"
+navbar:
+  title: "Adobe Analytics & R"
+  left:
+    - text: "Overview"
+      href: index.html
+    - text: "Initial Setup"
+      href: setup.html
+    - text: "Basic Examples"
+      menu:
+       - text: "Trended Visits by Device Type"
+         href: simple-trended-visits-by-devicetype.html
+       - text: "Simple Dimension Filter"
+         href: simple-dim-filter.html
+       - text: "Apply Segment by Segment ID"
+         href: segment-by-id.html
+    - text: "Intermediate Examples"
+      menu:
+       - text: "2D Sparklines/Heatmap"
+         href: pivot-sparklines-heatmap.html
+       - text: "Simple Inline Segment"
+         href: simple-inline-segment.html
+output:
+  html_document:
+    theme: simplex
+    css: includes/styles.css
+    title-prefix: "Adobe Analytics and R Examples"
+    includes:
+      before_body: includes/analytics.html
+      after_body: includes/footer.html

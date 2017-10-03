@@ -1,0 +1,199 @@
+---
+title: "Pivoting Data (after Querying)"
+---
+
+This example pulls page views by day for **device type** and **site section** and then displays them two different ways:
+
+* As a heatmap with the totals for each device type / site section combination
+* As a grid of sparklines for each device type / site section combination
+
+# Setup/Config
+
+```{r child='includes/z_setup.Rmd'}
+```
+
+# Pull the Data
+
+This is a simple query with just three dimensions and one metric. We're pulling the data at a daily level so we can plot the sparklines, but we're then going to "roll it up" for the heatmap totals.
+
+```{r data-pull, message=FALSE, warning=FALSE, results='hide'}
+
+# Pull the data. See ?QueueTrended() for additional parameters. 
+aa_data <- QueueTrended(rsid,
+                        date.from = start_date,
+                        date.to = end_date,
+                        metrics = "pageviews",
+                        elements = c("mobiledevicetype","sitesection"),
+                        date.granularity = "day")
+
+# Go ahead and do a quick inspection of the data that was returned. This isn't required,
+# but it's a good check along the way.
+head(aa_data)
+```
+
+```{r data-pull-display, echo=FALSE, message=FALSE, warning=FALSE}
+# Nicer display of the head
+kable(head(aa_data))
+```
+
+# Data Munging
+
+We've got three things we want to do here. Actually, two are "wants," and one is a "need:"
+
+* **The Need** -- we need to aggregate/sum the page views so we can do the heatmap
+* **One Want** -- we want to convert the dimensions to factors with a "logical" order so that, more or less, both visualizations have page views descending from the top left corner to the bottom right corner
+* **Another Want** -- we want to only include the top 5 site sections by name, and then combine all of the others into an "Other" category
+
+The first two of these are pretty straightforward to do. The third gets a bit messy, as we have to first total up the site sections to figure out which are the "top 5," then go through an make all other site sections "(Other)," and then repeat the totalling process to treat "(Other)" as a single site section.
+
+```{r munging, message=FALSE, warning=FALSE, results='hide'}
+
+# Convert the datetime from POSIXlt to Date
+aa_data$datetime <- as.Date(aa_data$datetime)
+
+# Clean up the table a bit
+aa_data <- aa_data %>% 
+  mutate(device = ifelse(mobiledevicetype=="Other", "Desktop/Tablet", mobiledevicetype)) %>% 
+  select(datetime, device, sitesection, pageviews) 
+
+# Roll up to just be site section tables and then arrange the values for use in both grabbing the
+# top 5 values and then, ultimately, in converting the site section column to a factor. This is 
+# one of those things that is pretty standard to need to do. We're going to sort descending, but, 
+# for one of the data frames, we're actually going to need to reverse the order as we create the 
+# factors. This just comes with experimentation and experience.
+sitesection_totals <- aa_data %>% 
+  group_by(sitesection) %>% 
+  summarise(pageviews = sum(pageviews)) %>% 
+  arrange(-pageviews)
+
+# Do the same thing, but for device. For this one, we actually want to sort 
+# descending.
+device_totals <- aa_data %>% 
+  group_by(device) %>% 
+  summarise(pageviews = sum(pageviews)) %>% 
+  arrange(-pageviews)
+
+# Get the top 5 site sections and then change all other values to be "(Other)"
+
+# Get the top 5 site sections
+sitesection_top5 <- top_n(sitesection_totals, n = 5, wt = pageviews)
+
+# Add a column to the totals that uses "(Other)"
+sitesection_totals <- sitesection_totals %>% 
+  mutate(sitesection_new = ifelse(sitesection %in% sitesection_top5$sitesection,
+                                  sitesection,
+                                  "(Other)")) 
+
+# Update the original data to use the new site section
+aa_data <- aa_data %>% 
+  left_join(sitesection_totals, by = c(sitesection = "sitesection"))
+
+# Clean up the columns and update the totals by collapsing "(Other)" rows
+aa_data_new <- aa_data %>% 
+  mutate(pageviews = pageviews.x) %>% 
+  select(-sitesection) %>% 
+  mutate(sitesection = sitesection_new) %>% 
+  select(datetime, device, sitesection, pageviews) %>% 
+  group_by(datetime, device, sitesection) %>% 
+  summarise(pageviews = sum(pageviews))
+
+# Re-do the "totals" for sitesection
+sitesection_totals <- aa_data_new %>% 
+  group_by(sitesection) %>% 
+  summarise(pageviews = sum(pageviews)) %>% 
+  arrange(-pageviews)
+
+# Convert the sitesection and device columns to factors in both of our main data frames.
+aa_data_new$sitesection <- factor(aa_data_new$sitesection,
+                         levels = sitesection_totals$sitesection)
+aa_data_new$device <- factor(aa_data_new$device,
+                         levels = device_totals$device)
+
+# Remove the "datetime" component to get total page views for the heatmap
+aa_data_totals <- aa_data_new %>% 
+  group_by(device, sitesection) %>% 
+  summarise(pageviews = sum(pageviews))
+
+aa_data_totals$sitesection <- factor(aa_data_totals$sitesection,
+                         levels = rev(sitesection_totals$sitesection))    # Reversing the factor order
+aa_data_totals$device <- factor(aa_data_totals$device,
+                         levels = device_totals$device)
+
+# Let's just check that the aa_data_totals we created looks pretty normal
+head(aa_data_totals)
+
+```
+
+```{r munge-display, echo=FALSE, message=FALSE, warning=FALSE}
+# Nicer display of the head
+kable(head(aa_data_totals))
+```
+
+# Data Visualization
+
+We're going to break the standard for this site with this example by doing two visualizations:
+
+* A heatmap of the data
+* A similar grid, but with sparklines showing the data trended 
+
+## The Heatmap
+
+We'll make a little heatmap of the data in a pivoted fashion with ggplot. This requires two "geoms" -- `geom_tile()` to make the heatmap (the shaded grid), and then `geom_text()` to actually put the values in the heatmap. We'll use the `aa_data_totals` data frame for this.
+
+The use of the `format()` function in the `label` argument is a handy little way to get commas displayed in numbers as the 000s separator (which means it's easy to swap out if you're in a locale where that is not the convention).
+
+Note how the order of the rows and columns seems pretty logical -- from "biggest values" to "smallest values." This is entirely due to the data munging we did to convert **sitesection** and **device** to factors and imposing some logic on the ordering of their levels.
+
+There is a lot of additional adjustments that you may want to get into with this layout, but this site isn't intended to be a full tutorial on **ggplot2**, so we're going to call this "good enough."
+
+```{r visualization, message=FALSE, warning=FALSE}
+
+# Create the plot
+gg <- ggplot(aa_data_totals, mapping=aes(x = device, y = sitesection)) +
+  geom_tile(aes(fill = pageviews), colour = "grey30") +
+  geom_text(aes(label = format(pageviews, big.mark = ","))) +
+  scale_fill_gradient(low = "white", high = "green") +    # Specify the gradient colors
+  guides(fill = FALSE) +                                 # Remove the legend
+  theme_light() +
+  theme(panel.grid = element_blank(),
+        panel.border = element_blank(),
+        axis.ticks = element_blank())
+
+# Output the plot. You *could* just remove the "gg <-" in the code above, but it's
+# generally a best practice to create a plot object and then output it, rather than
+# outputting it on the fly.
+gg
+
+```
+
+## A Grid of Sparklines
+
+Now, we're going to use the _original_ data (albeit with **sitesection** and **device** converted to factors) to plot a bunch of sparklines. Note that this is a fundamentally different technique than what was used for the heatmap. The heatmap used a "grid" geom -- `geom_text()` -- for the layout. For the sparklines, we're going to relyin on `facet_grid()`, which is not a geom, but, rather, specifies a grid into which individual `geom_line()` geoms will be displayed.
+
+Once again, we've got relatively minimal tuning of the actual visualization here, and most of that is through adjustments through `theme()`. Obviously, this could be adjusted much more.
+
+```{r visualization-sparklines, message=FALSE, warning=FALSE}
+
+# Create the plot
+gg_sparklines <- ggplot(aa_data_new, mapping=aes(x = datetime, y = pageviews)) +
+  geom_line() +
+  facet_grid(sitesection ~ device, switch = "y") +
+  theme_light() +
+  theme(panel.grid = element_blank(),
+        panel.border = element_rect(fill = NA, colour = "gray80"),
+        panel.background = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(colour = "black"),
+        strip.text.y = element_text(angle = 0, hjust = 1),
+        axis.ticks = element_blank(),
+        axis.text = element_blank(),
+        axis.title.x = element_blank())
+
+# Output the plot. You *could* just remove the "gg <-" in the code above, but it's
+# generally a best practice to create a plot object and then output it, rather than
+# outputting it on the fly.
+gg_sparklines
+
+```
+
+

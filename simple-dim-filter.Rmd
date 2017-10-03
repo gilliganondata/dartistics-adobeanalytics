@@ -1,0 +1,74 @@
+---
+title: "Simple Dimension Filter"
+---
+
+This example pulls the top 10 pages by pageviews for the last thirty days, _for pages that have "excel" in the page name_*. 
+
+# Setup/Config
+
+```{r child='includes/z_setup.Rmd'}
+```
+
+# Pull the Data
+
+There are two main parts to this:
+
+```{r data-pull, message=FALSE, warning=FALSE, results='hide'}
+
+# Pull the data. See ?QueueRankes() for details on the arguments available.
+aa_data <- QueueRanked(rsid,
+                       date.from = start_date,
+                       date.to = end_date,
+                       metrics = "pageviews",
+                       elements = "page",
+                       top = 10,
+                       search = "excel")
+
+# Go ahead and do a quick inspection of the data that was returned. This isn't required,
+# but it's a good check along the way.
+head(aa_data)
+
+```
+
+```{r data-pull-display, echo=FALSE, message=FALSE, warning=FALSE}
+# Nicer display of the head
+kable(head(aa_data))
+```
+
+# Data Munging
+
+In order to keep the order in the bar chart, we need to convert the page column to be a factor. We'll reverse the order so that, when displayed in a bar chart, they'll be in descending order.
+
+```{r data-munging, message=FALSE, warning=FALSE}
+# Convert page to be a factor
+aa_data$name <- factor(aa_data$name,
+                       levels = rev(aa_data$name))
+```
+
+# Data Visualization
+
+This won't be the prettiest bar chart, but let's make a horizontal bar chart with the data. Remember, in **ggplot2**, a horizontal bar chart is just a normal bar chart with `coord_flip()`.
+
+```{r visualize, message=FALSE, warning=FALSE}
+
+# Create the plot. Note the stat="identity"" (because the data is already aggregated) and
+# the coord_flip(). And, I just can't stand it... added on the additional theme stuff to
+# clean up the plot a bit more.
+gg <- ggplot(aa_data, mapping = aes(x = name, y = pageviews)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  theme_light() +
+  theme(panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        panel.border = element_blank(),
+        axis.title.y = element_blank(),
+        axis.ticks.y = element_blank())
+
+# Output the plot. You *could* just remove the "gg <-" in the code above, but it's
+# generally a best practice to create a plot object and then output it, rather than
+# outputting it on the fly.
+gg
+
+```
+
+_* Yes. This is intentionally ironic._
