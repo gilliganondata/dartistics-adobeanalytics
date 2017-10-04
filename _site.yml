@@ -28,6 +28,7 @@ output:
     theme: flatly
     css: includes/styles.css
     title-prefix: "Adobe Analytics and R Examples"
+    fig_width: 10
     includes:
       before_body: includes/analytics.html
       after_body: includes/footer.html
