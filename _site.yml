@@ -21,9 +21,11 @@ navbar:
          href: pivot-sparklines-heatmap.html
        - text: "Simple Inline Segment"
          href: simple-inline-segment.html
+    - text: "dartistics.com"
+      href: http://dartistics.com
 output:
   html_document:
-    theme: simplex
+    theme: flatly
     css: includes/styles.css
     title-prefix: "Adobe Analytics and R Examples"
     includes:

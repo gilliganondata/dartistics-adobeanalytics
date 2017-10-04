@@ -15,10 +15,6 @@ This returns the exact same results as these [Apply Segment by Segment ID](segme
 ```{r child='includes/z_setup.Rmd'}
 ```
 
-```{r supplemental_setup}
-library(jsonlite)    # Needed for unbox() in segment creation
-```
-
 # Pull the Data
 
 This gets built up in what can feel a bit cumbersome. _Essentially_ (but not necessarily _intuitively_), Adobe Analytics segments can have containers within containers. R has an analog: lists. A list can have a list as an element. So, we use lists to define inline segments. 
