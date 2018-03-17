@@ -2,7 +2,7 @@
 title: "Simple Dimension Filter"
 ---
 
-This example pulls the top 10 pages by pageviews for the last thirty days, _for pages that have "excel" in the page name_*. 
+This example pulls the top 10 pages by pageviews for the last thirty days, _for pages that have "Intelligence" in the page name_. 
 
 # Setup/Config
 
@@ -22,7 +22,7 @@ aa_data <- QueueRanked(rsid,
                        metrics = "pageviews",
                        elements = "page",
                        top = 10,
-                       search = "excel")
+                       search = "Intelligence")
 
 # Go ahead and do a quick inspection of the data that was returned. This isn't required,
 # but it's a good check along the way.
@@ -71,4 +71,3 @@ gg
 
 ```
 
-_* Yes. This is intentionally ironic._

@@ -2,7 +2,7 @@
 title: "Apply Segment by Segment ID"
 ---
 
-This example pulls the top 10 pages for the last thirty days, _for visits where the entry page included the word "excel"_.*  We'll do this by referencing a segment that was built in the Adobe Analytics web UI.
+This example pulls the top 10 pages for the last thirty days, _for visits where the entry page included the word "Intelligence"_.  We'll do this by referencing a segment that was built in the Adobe Analytics web UI.
 
 # Setup/Config
 
@@ -26,7 +26,7 @@ aa_data <- QueueRanked(rsid,
                        metrics = "pageviews",
                        elements = "page",
                        top = 10,
-                       segment.id = "s300005730_59d38b213f1e920264d17ecd")
+                       segment.id = "s300003965_5aad9f5c22fa9942088629ea")
   
 # Go ahead and do a quick inspection of the data that was returned. This isn't required,
 # but it's a good check along the way.
@@ -74,5 +74,3 @@ gg <- ggplot(aa_data, mapping = aes(x = name, y = pageviews)) +
 gg
 
 ```
-
-_* Yes. This is intentionally ironic._

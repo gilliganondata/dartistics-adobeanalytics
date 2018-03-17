@@ -6,7 +6,7 @@ title: "Simple Inline Segment"
 
 **Note**: _This example uses the `unbox()` function from the `jsonlite` package. If you do not already have `jsonlite` installed (or if you're not sure), run `install.packages("jsonlite")` in the console before running this example._
 
-This example pulls the top 10 pages for the last thirty days, _for visits where the entry page included the word "excel"_.*  We'll do this by building a segment _dynamically_ rather than referencing a segment ID. Where this can come in handy is if you have a script where you want to work through a range of small little tweaks to one segment and re-pull the data. You don't want to build each segment in the web interface and then hardcode all those IDs! We may add an example for doing that later, but we're doing to keep this very simple for now.
+This example pulls the top 10 pages for the last thirty days, _for visits where the entry page included the word "Intelligence"_.  We'll do this by building a segment _dynamically_ rather than referencing a segment ID. Where this can come in handy is if you have a script where you want to work through a range of small little tweaks to one segment and re-pull the data. You don't want to build each segment in the web interface and then hardcode all those IDs! We may add an example for doing that later, but we're doing to keep this very simple for now.
 
 This returns the exact same results as these [Apply Segment by Segment ID](segment-by-id.html) example. It just doesn't require any work in the Adobe Analytics web interface to return the results.
 
@@ -27,7 +27,7 @@ my_segment <- list(container = list(type = unbox("visits"),
                                     rules = data.frame(name = "Entry Page Includes 'excel'",
                                                        element = "entrypage",
                                                        operator = "contains",
-                                                       value = "excel")))
+                                                       value = "Intelligence")))
 
 # Pull the data. See ?QueueRankes() for details on the arguments available. Note that
 # we're using segment.inline as an argument here.
@@ -84,5 +84,3 @@ gg <- ggplot(aa_data, mapping = aes(x = name, y = pageviews)) +
 gg
 
 ```
-
-_* Yes. This is intentionally ironic._
