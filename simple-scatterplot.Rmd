@@ -1,8 +1,8 @@
 ---
-title: "Traffic by Device Type"
+title: "Page Views by Visits Scatterplot (by Device Type)"
 ---
 
-This example pulls **visits** by **device type** for the last 30 days and then plots the data on a line chart.
+This example pulls **visits** and **pageviews** by **device type** for the last 30 days and then plots the data as a scatterplot. Like a lot of these examples, it's not super useful. But, it's got to be a pretty generic example to work in a straight copy/paste world. Scatterplots can _definitely_ be useful!
 
 # Setup/Config
 
@@ -18,7 +18,7 @@ This is a simple query.
 aa_data <- QueueTrended(rsid,
                         date.from = start_date,
                         date.to = end_date,
-                        metrics = "visits",
+                        metrics = c("pageviews", "visits"),
                         elements = "mobiledevicetype",
                         date.granularity = "day")
   
@@ -44,7 +44,7 @@ aa_data$datetime <- as.Date(aa_data$datetime)
 # Clean up the table a bit
 aa_data <- aa_data %>% 
   mutate(Device = ifelse(name=="Other", "Desktop/Tablet", name)) %>% 
-  select(datetime, Device, visits) 
+  select(datetime, Device, visits, pageviews) 
 
 # Check what it looks like now
 head(aa_data)
@@ -62,8 +62,8 @@ This won't be the prettiest plot, but this example isn't diving into the details
 ```{r visualize, message=FALSE, warning=FALSE}
 
 # Create the plot.
-gg <- ggplot(aa_data, mapping = aes(x = datetime, y = visits, colour = Device)) +
-  geom_line() +
+gg <- ggplot(aa_data, mapping = aes(x = visits, y = pageviews, colour = Device)) +
+  geom_point() +
   theme_light()
 
 # Output the plot. You *could* just remove the "gg <-" in the code above, but it's

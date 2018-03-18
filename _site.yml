@@ -11,6 +11,8 @@ navbar:
       menu:
        - text: "Trended Visits by Device Type"
          href: simple-trended-visits-by-devicetype.html
+       - text: "Scatterplot: Pageviews vs. Visits"
+         href: simple-trended-visits-by-devicetype.html
        - text: "Simple Dimension Filter"
          href: simple-dim-filter.html
        - text: "Apply Segment by Segment ID"
