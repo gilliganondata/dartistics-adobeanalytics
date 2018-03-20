@@ -162,7 +162,7 @@ gg <- ggplot(aa_data_totals, mapping=aes(x = device, y = sitesection)) +
 # Output the plot. You *could* just remove the "gg <-" in the code above, but it's
 # generally a best practice to create a plot object and then output it, rather than
 # outputting it on the fly.
-gg
+print(gg)
 
 ```
 
@@ -192,7 +192,7 @@ gg_sparklines <- ggplot(aa_data_new, mapping=aes(x = datetime, y = pageviews)) +
 # Output the plot. You *could* just remove the "gg <-" in the code above, but it's
 # generally a best practice to create a plot object and then output it, rather than
 # outputting it on the fly.
-gg_sparklines
+print(gg_sparklines)
 
 ```
 

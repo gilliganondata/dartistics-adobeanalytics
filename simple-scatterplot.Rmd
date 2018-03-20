@@ -69,6 +69,6 @@ gg <- ggplot(aa_data, mapping = aes(x = visits, y = pageviews, colour = Device))
 # Output the plot. You *could* just remove the "gg <-" in the code above, but it's
 # generally a best practice to create a plot object and then output it, rather than
 # outputting it on the fly.
-gg
+print(gg)
 
 ```

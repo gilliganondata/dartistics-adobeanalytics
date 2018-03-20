@@ -1,36 +1,41 @@
-name: "Adobe Analytics and R - Examples"
-output_dir: "../dartistics.com/adobeanalytics"
+name: Adobe Analytics and R - Examples
+output_dir: ../dartistics.com/adobeanalytics
 navbar:
-  title: "Adobe Analytics & R"
+  title: Adobe Analytics & R
   left:
-    - text: "Overview"
-      href: index.html
-    - text: "Initial Setup"
-      href: setup.html
-    - text: "Basic Examples"
-      menu:
-       - text: "Trended Visits by Device Type"
-         href: simple-trended-visits-by-devicetype.html
-       - text: "Scatterplot: Pageviews vs. Visits"
-         href: simple-trended-visits-by-devicetype.html
-       - text: "Simple Dimension Filter"
-         href: simple-dim-filter.html
-       - text: "Apply Segment by Segment ID"
-         href: segment-by-id.html
-    - text: "Intermediate Examples"
-      menu:
-       - text: "2D Sparklines/Heatmap"
-         href: pivot-sparklines-heatmap.html
-       - text: "Simple Inline Segment"
-         href: simple-inline-segment.html
-    - text: "dartistics.com"
-      href: http://dartistics.com
+  - text: Overview
+    href: index.html
+  - text: Initial Setup
+    href: setup.html
+  - text: Basic Examples
+    menu:
+    - text: Trended Visits by Device Type
+      href: simple-trended-visits-by-devicetype.html
+    - text: 'Scatterplot: Pageviews vs. Visits'
+      href: simple-trended-visits-by-devicetype.html
+    - text: Simple Dimension Filter
+      href: simple-dim-filter.html
+    - text: Apply Segment by Segment ID
+      href: segment-by-id.html
+  - text: Intermediate Examples
+    menu:
+    - text: 2D Sparklines/Heatmap
+      href: pivot-sparklines-heatmap.html
+    - text: Simple Inline Segment
+      href: simple-inline-segment.html
+    - text: Day/Hour Heatmap
+      href: int-heatmap.html
+  - text: dartistics.com
+    href: http://dartistics.com
 output:
   html_document:
     theme: flatly
     css: includes/styles.css
-    title-prefix: "Adobe Analytics and R Examples"
+    title-prefix: Adobe Analytics and R Examples
     fig_width: 10
     includes:
       before_body: includes/analytics.html
       after_body: includes/footer.html
+    lib_dir: site_libs
+    self_contained: no
+
