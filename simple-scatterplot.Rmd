@@ -34,7 +34,7 @@ kable(head(aa_data))
 
 # Data Munging
 
-There's not a ton of data munging to be done here. We'll change the date to be `Date` instead of `POSIXlt` to play nice with the plotting, and we'll grab just the columns we need to do the data visualization. And, for giggles, we'll change "Other" to be "Desktop/Notebook."
+There's not a ton of data munging to be done here. We'll change the date to be `Date` instead of `POSIXlt` to play nice with the plotting, and we'll grab just the columns we need to do the data visualization. And, for giggles, we'll change "Other" to be "Desktop/Laptop."
 
 ```{r data-munging, message=FALSE, warning=FALSE, results='hide'}
 
@@ -43,7 +43,7 @@ aa_data$datetime <- as.Date(aa_data$datetime)
 
 # Clean up the table a bit
 aa_data <- aa_data %>% 
-  mutate(Device = ifelse(name=="Other", "Desktop/Tablet", name)) %>% 
+  mutate(Device = ifelse(name=="Other", "Desktop/Laptop", name)) %>% 
   select(datetime, Device, visits, pageviews) 
 
 # Check what it looks like now

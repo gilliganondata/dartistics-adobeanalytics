@@ -53,7 +53,7 @@ aa_data$datetime <- as.Date(aa_data$datetime)
 
 # Clean up the table a bit
 aa_data <- aa_data %>% 
-  mutate(device = ifelse(mobiledevicetype=="Other", "Desktop/Tablet", mobiledevicetype)) %>% 
+  mutate(device = ifelse(mobiledevicetype=="Other", "Desktop/Laptop", mobiledevicetype)) %>% 
   select(datetime, device, sitesection, pageviews) 
 
 # Roll up to just be site section tables and then arrange the values for use in both grabbing the
